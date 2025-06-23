@@ -42,7 +42,7 @@ cd DiscordChatBridge
 
 # 3. Готовый файл будет здесь:
 ```bash
-#    build/libs/discord-chat-bridge-<version>.jar
+build/libs/discord-chat-bridge-<version>.jar
 ```
 
 | Ключ                   | Описание                          |
