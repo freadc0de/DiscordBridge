@@ -18,7 +18,7 @@
 
 ## 📥 Установка
 
-1. **Скачайте** релиз с [Releases](https://github.com/DiscordBridge/DiscordChatBridge/releases).
+1. **Скачайте** релиз с [Releases]([https://github.com/DiscordBridge/DiscordChatBridge/releases](https://github.com/freadc0de/DiscordBridge/releases/tag/1.0)).
 2. Положите `discord-chat-bridge-*.jar` в папку `plugins/` вашего сервера.
 3. Запустите сервер, затем откройте `plugins/DiscordChatBridge/config.yml`
 4. `/reload` или рестарт сервера — готово!
