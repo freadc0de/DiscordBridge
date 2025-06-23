@@ -1,0 +1,6 @@
+name: DiscordChatBridge
+main: dev.fread.discordbridge.DiscordChatBridge
+version: 1.0.0
+api-version: 1.16
+author: fread
+description: Чат между сервером Minecraft и Discord-каналом

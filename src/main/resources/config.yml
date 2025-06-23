@@ -1,0 +1,10 @@
+discord:
+  token: "BOT_TOKEN"
+  channelId: "123456789012345678"
+
+chat:
+  to-minecraft-prefix: "&3220a6[&7568f9ᴅ&3220a6] &c9c0ff• "
+
+messages:
+  discord-to-minecraft:
+    - "&897dff{author} &514f5b→ &ddd6ff{message}"
