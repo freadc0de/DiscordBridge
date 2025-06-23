@@ -29,15 +29,19 @@
 
 ## 🛠️ Сборка из исходников
 
-```bash
 # 1. Клонируем репозиторий
+```bash
 git clone https://github.com/your-repo/DiscordChatBridge.git
 cd DiscordChatBridge
+```
 
 # 2. Собираем fat‑jar (Gradle 8, Java 17)
+```bash
 ./gradlew shadowJar
+```
 
 # 3. Готовый файл будет здесь:
+```bash
 #    build/libs/discord-chat-bridge-<version>.jar
 ```
 
@@ -54,5 +58,5 @@ cd DiscordChatBridge
 
 ## 🤝 Contributing
 
-PR‑ы, ишью и фич‑реквесты приветствуются!
+PR‑ы приветствуются!
 Формат коммит‑сообщений: `type(scope): subject`.
