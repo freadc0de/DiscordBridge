@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ConfigManager {
 
@@ -19,14 +20,11 @@ public class ConfigManager {
     private String       toMinecraftPrefix;
     private List<String> mcToDiscordFormat;
     private List<String> discordToMinecraftFormat;
+    private List<String> discordHoverLines;
 
-    public ConfigManager(DiscordChatBridge plugin) {
-        this.plugin = plugin;
-    }
+    public ConfigManager(DiscordChatBridge plugin) { this.plugin = plugin; }
 
-    public void load() {
-        reload();
-    }
+    public void load() { reload(); }
 
     public void reload() {
         plugin.reloadConfig();
@@ -34,9 +32,13 @@ public class ConfigManager {
 
         toDiscordPrefix          = c.getString("chat.to-discord-prefix",   "&00FF00[MC]&r ");
         toMinecraftPrefix        = c.getString("chat.to-minecraft-prefix", "&00FF00[DISCORD]&r ");
+
         mcToDiscordFormat        = c.getStringList("messages.minecraft-to-discord");
         discordToMinecraftFormat = c.getStringList("messages.discord-to-minecraft");
+        discordHoverLines        = c.getStringList("messages.discord-hover");
     }
+
+    /* ---------- форматирование ---------- */
 
     public String formatMcToDiscord(Player p, String msg) {
         String base = mcToDiscordFormat.get(0)
@@ -52,13 +54,24 @@ public class ConfigManager {
         return applyColors(toMinecraftPrefix + base);
     }
 
+    /** Готовые строки для Hover-текста (уже с цветами) */
+    public List<String> buildDiscordHover(String author, String msg) {
+        return discordHoverLines.stream()
+                .map(s -> applyColors(
+                        s.replace("{author}", author)
+                                .replace("{message}", msg)))
+                .collect(Collectors.toList());
+    }
+
+    /* ---------- утилиты ---------- */
+
     private String applyColors(String s) {
+        // &FFFFFF → §x§F§F§F§F§F§F
         Matcher m = HEX_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
-        while (m.find()) {
+        while (m.find())
             m.appendReplacement(buf,
                     ChatColor.of("#" + m.group(1)).toString());
-        }
         m.appendTail(buf);
         return ChatColor.translateAlternateColorCodes('&', buf.toString());
     }

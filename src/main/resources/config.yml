@@ -8,3 +8,12 @@ chat:
 messages:
   discord-to-minecraft:
     - "&897dff{author} &514f5b→ &ddd6ff{message}"
+
+  discord-hover:
+    - "&7"
+    - "&7bacff ♯ Канал: &3c84ff&l(название канала в дискорде для моста сообщений) "
+    - "&798cff ⚑ Отправитель: &546cff&l{author} "
+    - "&7"
+    - "&d3d2ff • Чтобы перейти к этому сообщению, нажмите "
+    - "&d3d2ff на текст"
+    - "&7"
