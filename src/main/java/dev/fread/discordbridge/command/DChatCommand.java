@@ -21,7 +21,6 @@ public class DChatCommand implements CommandExecutor {
                 return true;
             }
 
-            /* ── перезагружаем конфиг ── */
             plugin.getConfigManager().reload();
             sender.sendMessage(ChatColor.GREEN + "DiscordChatBridge: конфигурация перезагружена.");
             plugin.getLogger().info(sender.getName() + " перезагрузил конфиг.");

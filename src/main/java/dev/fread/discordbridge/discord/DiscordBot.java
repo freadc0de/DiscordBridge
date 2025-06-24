@@ -50,7 +50,6 @@ public class DiscordBot {
         );
 
         jda = JDABuilder.createDefault(token, intents)
-                /* отключаем ненужные кеши — предупреждения исчезнут */
                 .disableCache(CacheFlag.VOICE_STATE,
                         CacheFlag.EMOJI,
                         CacheFlag.STICKER,
@@ -63,7 +62,6 @@ public class DiscordBot {
         if (channel == null)
             plugin.getLogger().warning("Канал Discord " + channelId + " не найден!");
 
-        /* ─── Discord → Minecraft ───────────────────────────────────────── */
         jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onMessageReceived(@NotNull MessageReceivedEvent e) {
@@ -72,12 +70,10 @@ public class DiscordBot {
                 String author  = e.getAuthor().getName();
                 String content = e.getMessage().getContentDisplay();
 
-                /* Основная строка */
                 String legacyLine = plugin.getConfigManager()
                         .formatDiscordToMinecraft(author, content);
                 Component line = LegacyComponentSerializer.legacySection().deserialize(legacyLine);
 
-                /* --- Hover без лишних переводов строки --- */
                 List<String> hoverLines = plugin.getConfigManager().buildDiscordHover(author, content);
                 Component hover = Component.empty();
                 for (int i = 0; i < hoverLines.size(); i++) {
@@ -87,18 +83,15 @@ public class DiscordBot {
                         hover = hover.append(Component.newline());
                 }
 
-                /* Click → открыть сообщение в Discord */
                 line = line.hoverEvent(HoverEvent.showText(hover))
                         .clickEvent(ClickEvent.openUrl(e.getMessage().getJumpUrl()));
 
-                /* Отправляем всем игрокам */
                 for (Player p : Bukkit.getOnlinePlayers())
                     p.sendMessage(line);
             }
         });
     }
 
-    /* ------------- Minecraft → Discord (Embed) ------------- */
 
     public void sendMinecraftEmbed(Player player, String plainMessage) {
         if (channel == null) return;
@@ -132,8 +125,6 @@ public class DiscordBot {
 
         channel.sendMessageEmbeds(eb.build()).queue();
     }
-
-    /* ------------------------------------------------------- */
 
     public void sendToDiscordPlain(String msg) {
         if (channel != null)

@@ -38,7 +38,6 @@ public class ConfigManager {
         discordHoverLines        = c.getStringList("messages.discord-hover");
     }
 
-    /* ---------- форматирование ---------- */
 
     public String formatMcToDiscord(Player p, String msg) {
         String base = mcToDiscordFormat.get(0)
@@ -54,7 +53,6 @@ public class ConfigManager {
         return applyColors(toMinecraftPrefix + base);
     }
 
-    /** Готовые строки для Hover-текста (уже с цветами) */
     public List<String> buildDiscordHover(String author, String msg) {
         return discordHoverLines.stream()
                 .map(s -> applyColors(
@@ -63,10 +61,8 @@ public class ConfigManager {
                 .collect(Collectors.toList());
     }
 
-    /* ---------- утилиты ---------- */
 
     private String applyColors(String s) {
-        // &FFFFFF → §x§F§F§F§F§F§F
         Matcher m = HEX_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
         while (m.find())
