@@ -1,9 +1,11 @@
 package dev.fread.discordbridge;
 
+import dev.fread.discordbridge.command.DChatCommand;
 import dev.fread.discordbridge.config.ConfigManager;
 import dev.fread.discordbridge.discord.DiscordBot;
 import dev.fread.discordbridge.listener.ChatListener;
 import dev.fread.discordbridge.listener.JoinQuitListener;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class DiscordChatBridge extends JavaPlugin {
@@ -29,11 +31,13 @@ public final class DiscordChatBridge extends JavaPlugin {
             return;
         }
 
-        /*  ── Регистрация слушателей ─────────────────────────────── */
         getServer().getPluginManager().registerEvents(new ChatListener(this),      this);
         getServer().getPluginManager().registerEvents(new JoinQuitListener(this),  this);
 
-        getLogger().info("DiscordChatBridge активирован!");
+        getCommand("dchat").setExecutor(new DChatCommand(this));
+        getCommand("dchat").setTabCompleter((s, c, l, a) -> java.util.Collections.singletonList("reload"));
+
+        getLogger().info(ChatColor.GREEN + "DiscordChatBridge активирован!");
     }
 
     @Override
