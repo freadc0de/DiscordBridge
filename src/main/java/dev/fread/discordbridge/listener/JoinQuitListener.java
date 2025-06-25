@@ -12,13 +12,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Kicks first-time players with a coloured link screen and fires join/quit embeds once linked.
- */
 public class JoinQuitListener implements Listener {
 
     private final DiscordChatBridge plugin;
@@ -26,21 +22,16 @@ public class JoinQuitListener implements Listener {
 
     public JoinQuitListener(DiscordChatBridge plugin) { this.plugin = plugin; }
 
-    /* --------------------------------------------------------------------- */
-    /*                                 JOIN                                  */
-    /* --------------------------------------------------------------------- */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent e) {
-        e.joinMessage(null); // suppress vanilla yellow
+        e.joinMessage(null);
 
-        // not linked → generate code & kick with coloured text
         if (!plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId())) {
             String code = plugin.getLinkManager().createCode(e.getPlayer().getUniqueId());
             Bukkit.getScheduler().runTask(plugin, () -> kickWithColours(e, code));
             return;
         }
 
-        // already linked → send green embed
         plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), true);
     }
 
@@ -56,9 +47,6 @@ public class JoinQuitListener implements Listener {
         e.getPlayer().kick(reason);
     }
 
-    /* --------------------------------------------------------------------- */
-    /*                                 QUIT                                  */
-    /* --------------------------------------------------------------------- */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
         e.quitMessage(null);
@@ -66,13 +54,7 @@ public class JoinQuitListener implements Listener {
             plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), false);
     }
 
-    /* --------------------------------------------------------------------- */
-    /**
-     * Converts both legacy &x codes and 6-digit HEX codes to § codes so that
-     * the disconnect screen displays proper colours.
-     */
     private String colourise(String input) {
-        // convert &RRGGBB → §x§R§R§G§G§B§B
         Matcher m = HEX_PATTERN.matcher(input);
         StringBuffer out = new StringBuffer();
         while (m.find()) {
@@ -82,7 +64,6 @@ public class JoinQuitListener implements Listener {
             m.appendReplacement(out, replacement.toString());
         }
         m.appendTail(out);
-        // translate traditional colour codes
         return ChatColor.translateAlternateColorCodes('&', out.toString());
     }
 }

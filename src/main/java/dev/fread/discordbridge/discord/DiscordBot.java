@@ -26,9 +26,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/**
- * Handles Discord ↔ Minecraft messaging and DM-based account linking.
- */
 public class DiscordBot {
 
     private final DiscordChatBridge plugin;
@@ -43,7 +40,6 @@ public class DiscordBot {
         this.plugin    = plugin;
         this.channelId = channelId;
 
-        /* include DIRECT_MESSAGES so we can read private codes */
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 GatewayIntent.GUILD_MESSAGES,
                 GatewayIntent.DIRECT_MESSAGES,
@@ -60,7 +56,6 @@ public class DiscordBot {
         if (channel == null)
             plugin.getLogger().warning("Discord channel " + channelId + " not found!");
 
-        /* ---------------- Discord (guild) → Minecraft ---------------- */
         jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onMessageReceived(@NotNull MessageReceivedEvent e) {
@@ -88,7 +83,6 @@ public class DiscordBot {
             }
         });
 
-        /* ---------------- Discord DM → account link ------------------ */
         jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onMessageReceived(@NotNull MessageReceivedEvent e) {
@@ -97,13 +91,11 @@ public class DiscordBot {
                 String msg = e.getMessage().getContentDisplay().trim();
 
                 plugin.getLinkManager().consumeCode(msg).ifPresentOrElse(uuid -> {
-                    // SUCCESS
                     plugin.getLinkManager().link(uuid, e.getAuthor().getId());
                     sendDMEmbed(e.getChannel(), Color.decode("#57F287"),
                             "✅ Ваш аккаунт успешно слинкован!");
                     plugin.getLogger().info("Linked " + uuid + " <-> " + e.getAuthor().getAsTag());
                 }, () -> {
-                    // either already linked or invalid code
                     sendDMEmbed(e.getChannel(), Color.decode("#ED4245"),
                             "❌ Этот код недействителен либо вы уже линковали ваш аккаунт.");
                 });
@@ -111,14 +103,10 @@ public class DiscordBot {
         });
     }
 
-    /* ------------------------------------------------------------------ */
-    /*                          public helpers                             */
-    /* ------------------------------------------------------------------ */
     public String getBotName() {
         return jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator();
     }
 
-    /* Minecraft → Discord chat embed */
     public void sendMinecraftEmbed(Player player, String plainMessage) {
         if (channel == null) return;
         EmbedBuilder eb = new EmbedBuilder()
@@ -131,7 +119,6 @@ public class DiscordBot {
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
-    /* join / quit */
     public void sendJoinLeaveEmbed(Player player, boolean joined) {
         if (channel == null) return;
         Color  c = joined ? Color.decode("#57F287") : Color.decode("#ED4245");
@@ -153,9 +140,6 @@ public class DiscordBot {
 
     public void shutdown() { jda.shutdownNow(); }
 
-    /* ------------------------------------------------------------------ */
-    /*                         private helpers                             */
-    /* ------------------------------------------------------------------ */
     private void sendDMEmbed(MessageChannel dm, Color color, String text) {
         EmbedBuilder eb = new EmbedBuilder()
                 .setDescription(text)

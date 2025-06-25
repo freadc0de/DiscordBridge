@@ -22,12 +22,9 @@ public class LinkManager {
         this.file   = new File(plugin.getDataFolder(), "links.yml");
     }
 
-    /* --------------------------------------------------------------------- */
-
     public void load() {
         try {
             if (!file.exists()) {
-                // создаём пустой файл и сразу записываем «{}»
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
@@ -48,7 +45,7 @@ public class LinkManager {
     }
 
     public void save() {
-        if (data == null) return;                        // безопасно на случай раннего disable
+        if (data == null) return;
         for (Map.Entry<UUID, String> e : uuidToDiscord.entrySet()) {
             data.set(e.getKey().toString() + ".discord", e.getValue());
         }
@@ -57,8 +54,6 @@ public class LinkManager {
             plugin.getLogger().severe("Failed to save links.yml: " + ex.getMessage());
         }
     }
-
-    /* --------------------------------------------------------------------- */
 
     public boolean isLinked(UUID uuid)          { return uuidToDiscord.containsKey(uuid); }
     public String  getDiscordId(UUID uuid)      { return uuidToDiscord.get(uuid); }

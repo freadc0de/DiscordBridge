@@ -36,11 +36,9 @@ public final class DiscordChatBridge extends JavaPlugin {
             return;
         }
 
-        /* listeners */
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         getServer().getPluginManager().registerEvents(new JoinQuitListener(this), this);
 
-        /* command */
         getCommand("dchat").setExecutor(new DChatCommand(this));
         getCommand("dchat").setTabCompleter((s, c, l, a) -> java.util.Collections.singletonList("reload"));
 
