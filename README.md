@@ -18,6 +18,15 @@
 
 ---
 
+## 📋 Список версий
+
+|    Minecraft    | Последний релиз | Java Version | Platforms     | Support Status                 |
+|:---------------:|:---------------:|:------------:|:--------------|:-------------------------------|
+|  1.20 - 1.20.6  |    _latest_     |      21      | Paper         | ✅ **Active Release**          |
+|  1.19 – 1.19.4  |    _latest_     |      17      | Paper         | ✅ **Active Release**          |
+
+---
+
 ## 📥 Установка
 
 1. **Скачайте** релиз с [Releases](https://github.com/freadc0de/DiscordBridge/releases)
