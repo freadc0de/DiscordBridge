@@ -10,7 +10,7 @@ plugins {
 }
 
 group   = 'dev.fread'
-version = '1.0.1'        // ↑ номер свободно меняйте
+version = '1.0'        // ↑ номер свободно меняйте
 
 repositories {
     mavenCentral()
@@ -22,7 +22,7 @@ dependencies {
     /* API Paper 1.20.1 — компилируемся под новую, но в plugin.yml
        оставляем api-version: 1.16 чтобы плагин спокойно шёл и на 1.16-1.20 */
     compileOnly 'io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT'
-
+    runtimeOnly("com.mysql:mysql-connector-j:8.3.0")
     /* Discord SDK (будет за-shade-ен внутрь JAR-файла) */
     implementation('net.dv8tion:JDA:5.0.0-beta.23') {
         exclude module: 'opus-java'   // нативка для войса не нужна

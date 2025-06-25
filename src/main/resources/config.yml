@@ -5,6 +5,15 @@ discord:
   channelId: "123456789012345678"
   requiredRoleId: "123456789012345678" # role that grants access
 
+mysql:
+  enabled: false
+  host: localhost
+  port: 3306
+  database: database
+  user: root
+  password: "password"
+
+
 chat:
   to-minecraft-prefix: "&3220a6[&7568f9ᴅ&3220a6] &c9c0ff• "
 
@@ -33,6 +42,7 @@ link:
     - ""
     - ""
     - "&4d4f50* * *"
+
   kick-message:
     - "&4d4f50* * *"
     - ""

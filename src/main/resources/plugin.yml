@@ -1,6 +1,6 @@
 name: DiscordChatBridge
 main: dev.fread.discordbridge.DiscordChatBridge
-version: 1.4.1
+version: 1.4.2
 api-version: 1.16
 author: fread
 description: Чат-мост между Minecraft и Discord
