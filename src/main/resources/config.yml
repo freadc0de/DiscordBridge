@@ -1,3 +1,5 @@
+update-check: true
+
 discord:
   token: "BOT_TOKEN"
   channelId: "123456789012345678"

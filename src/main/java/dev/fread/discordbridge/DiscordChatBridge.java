@@ -6,6 +6,7 @@ import dev.fread.discordbridge.config.ConfigManager;
 import dev.fread.discordbridge.discord.DiscordBot;
 import dev.fread.discordbridge.listener.ChatListener;
 import dev.fread.discordbridge.listener.JoinQuitListener;
+import dev.fread.discordbridge.update.UpdateChecker;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -26,10 +27,10 @@ public final class DiscordChatBridge extends JavaPlugin {
         linkManager.load();
 
         try {
-            discordBot = new DiscordBot(this,
+            discordBot = new DiscordBot(
+                    this,
                     getConfig().getString("discord.token"),
                     getConfig().getString("discord.channelId"));
-            getLogger().info("Discord bot started.");
         } catch (Exception ex) {
             getLogger().severe("Failed to init Discord bot: " + ex.getMessage());
             getServer().getPluginManager().disablePlugin(this);
@@ -40,7 +41,12 @@ public final class DiscordChatBridge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JoinQuitListener(this), this);
 
         getCommand("dchat").setExecutor(new DChatCommand(this));
-        getCommand("dchat").setTabCompleter((s, c, l, a) -> java.util.Collections.singletonList("reload"));
+        getCommand("dchat").setTabCompleter((s, c, l, a) ->
+                java.util.Collections.singletonList("reload"));
+
+        if (getConfig().getBoolean("update-check", true)) {
+            new UpdateChecker(this).check();
+        }
 
         getLogger().info(ChatColor.GREEN + "DiscordChatBridge enabled!");
     }
@@ -49,7 +55,6 @@ public final class DiscordChatBridge extends JavaPlugin {
     public void onDisable() {
         if (discordBot != null) discordBot.shutdown();
         linkManager.save();
-        getLogger().info("DiscordChatBridge disabled.");
     }
 
     public ConfigManager getConfigManager() { return configManager; }

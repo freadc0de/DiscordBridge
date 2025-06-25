@@ -90,9 +90,9 @@ public class DiscordBot {
         plugin.getLinkManager().consumeCode(code).ifPresentOrElse(uuid -> {
             plugin.getLinkManager().link(uuid, e.getAuthor().getId());
             sendDmEmbed(e.getChannel(), new Color(0x57F287),
-                    "✅ Linked! You may now join the server.");
+                    "✅ Ваш аккаунт успешно слинкован с сервером!");
         }, () -> sendDmEmbed(e.getChannel(), new Color(0xED4245),
-                "❌ Invalid code or already linked."));
+                "❌ Неверный код либо аккаунт уже слинкован"));
     }
 
     private void sendDmEmbed(MessageChannel dm, Color color, String text) {
@@ -139,7 +139,7 @@ public class DiscordBot {
         Color c = join ? new Color(0x57F287) : new Color(0xED4245);
         channel.sendMessageEmbeds(List.of(new EmbedBuilder()
                 .setAuthor(p.getName(), null, "https://mc-heads.net/avatar/"+p.getName()+"/64")
-                .setDescription("**"+p.getName()+"** "+(join?"joined.":"left."))
+                .setDescription("**"+p.getName()+"** "+(join?"зашел на сервер":"вышел с сервера"))
                 .setColor(c)
                 .setFooter("Stats • " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))
                 .build())).queue();

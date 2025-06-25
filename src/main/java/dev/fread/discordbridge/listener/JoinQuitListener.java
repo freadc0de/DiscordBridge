@@ -29,14 +29,13 @@ public class JoinQuitListener implements Listener {
 
         if (!plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId())) {
             String code = plugin.getLinkManager().createCode(e.getPlayer().getUniqueId());
-            Component kick = buildKickMessage(plugin.getConfig().getStringList("link.kick-message"), code);
+            Component kick = buildKick(plugin.getConfig().getStringList("link.kick-message"), code);
             e.disallow(PlayerLoginEvent.Result.KICK_OTHER, kick);
             return;
         }
 
         if (!plugin.getDiscordBot().hasRequiredRole(e.getPlayer().getUniqueId())) {
-            List<String> roleLines = plugin.getConfig().getStringList("link.role-kick");
-            Component kick = buildKickMessage(roleLines, ""); // no {code} needed
+            Component kick = buildKick(plugin.getConfig().getStringList("link.role-kick"), "");
             e.disallow(PlayerLoginEvent.Result.KICK_OTHER, kick);
         }
     }
@@ -53,19 +52,17 @@ public class JoinQuitListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent e) {
         e.quitMessage(null);
-        if (plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId())) {
+        if (plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId()))
             plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), false);
-        }
     }
 
-    private Component buildKickMessage(List<String> lines, String code) {
-        for (int i = 0; i < lines.size(); i++) {
-            lines.set(i, lines.get(i)
+    private Component buildKick(List<String> template, String code) {
+        for (int i = 0; i < template.size(); i++)
+            template.set(i, template.get(i)
                     .replace("{code}", code)
                     .replace("{bot}", plugin.getDiscordBot().getBotName()));
-        }
-        String legacy = colourise(String.join("\n", lines));
-        return LegacyComponentSerializer.legacySection().deserialize(legacy);
+        return LegacyComponentSerializer.legacySection().deserialize(
+                colourise(String.join("\n", template)));
     }
 
     private String colourise(String s) {
