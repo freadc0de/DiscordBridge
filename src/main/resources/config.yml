@@ -1,6 +1,7 @@
 discord:
   token: "BOT_TOKEN"
   channelId: "123456789012345678"
+  requiredRoleId: "123456789012345678" # role that grants access
 
 chat:
   to-minecraft-prefix: "&3220a6[&7568f9ᴅ&3220a6] &c9c0ff• "
@@ -19,6 +20,17 @@ messages:
     - "&7"
 
 link:
+  role-kick:
+    - "&4d4f50* * *"
+    - ""
+    - ""
+    - "&ff4f2f&lСТОП"
+    - ""
+    - "&9c8d8aЧтобы войти на сервер, вы должны иметь роль"
+    - "&9c8d8aпри которой вас могут пустить на сервер"
+    - ""
+    - ""
+    - "&4d4f50* * *"
   kick-message:
     - "&4d4f50* * *"
     - ""

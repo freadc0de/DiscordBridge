@@ -4,11 +4,11 @@ import dev.fread.discordbridge.DiscordChatBridge;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.List;
@@ -18,50 +18,63 @@ import java.util.regex.Pattern;
 public class JoinQuitListener implements Listener {
 
     private final DiscordChatBridge plugin;
-    private static final Pattern HEX_PATTERN = Pattern.compile("&([A-Fa-f0-9]{6})");
+    private static final Pattern HEX = Pattern.compile("&([A-Fa-f0-9]{6})");
 
-    public JoinQuitListener(DiscordChatBridge plugin) { this.plugin = plugin; }
+    public JoinQuitListener(DiscordChatBridge plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onJoin(PlayerJoinEvent e) {
-        e.joinMessage(null);
+    public void onLogin(PlayerLoginEvent e) {
 
         if (!plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId())) {
             String code = plugin.getLinkManager().createCode(e.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTask(plugin, () -> kickWithColours(e, code));
+            Component kick = buildKickMessage(plugin.getConfig().getStringList("link.kick-message"), code);
+            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, kick);
             return;
         }
 
-        plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), true);
+        if (!plugin.getDiscordBot().hasRequiredRole(e.getPlayer().getUniqueId())) {
+            List<String> roleLines = plugin.getConfig().getStringList("link.role-kick");
+            Component kick = buildKickMessage(roleLines, ""); // no {code} needed
+            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, kick);
+        }
     }
 
-    private void kickWithColours(PlayerJoinEvent e, String code) {
-        List<String> lines = plugin.getConfig().getStringList("link.kick-message");
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoin(PlayerJoinEvent e) {
+        e.joinMessage(null);
+        if (plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId()) &&
+                plugin.getDiscordBot().hasRequiredRole(e.getPlayer().getUniqueId())) {
+            plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent e) {
+        e.quitMessage(null);
+        if (plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId())) {
+            plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), false);
+        }
+    }
+
+    private Component buildKickMessage(List<String> lines, String code) {
         for (int i = 0; i < lines.size(); i++) {
             lines.set(i, lines.get(i)
                     .replace("{code}", code)
                     .replace("{bot}", plugin.getDiscordBot().getBotName()));
         }
         String legacy = colourise(String.join("\n", lines));
-        Component reason = LegacyComponentSerializer.legacySection().deserialize(legacy);
-        e.getPlayer().kick(reason);
+        return LegacyComponentSerializer.legacySection().deserialize(legacy);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent e) {
-        e.quitMessage(null);
-        if (plugin.getLinkManager().isLinked(e.getPlayer().getUniqueId()))
-            plugin.getDiscordBot().sendJoinLeaveEmbed(e.getPlayer(), false);
-    }
-
-    private String colourise(String input) {
-        Matcher m = HEX_PATTERN.matcher(input);
+    private String colourise(String s) {
+        Matcher m = HEX.matcher(s);
         StringBuffer out = new StringBuffer();
         while (m.find()) {
-            String hex = m.group(1);
-            StringBuilder replacement = new StringBuilder("§x");
-            for (char c : hex.toCharArray()) replacement.append('§').append(c);
-            m.appendReplacement(out, replacement.toString());
+            StringBuilder rep = new StringBuilder("§x");
+            for (char c : m.group(1).toCharArray()) rep.append('§').append(c);
+            m.appendReplacement(out, rep.toString());
         }
         m.appendTail(out);
         return ChatColor.translateAlternateColorCodes('&', out.toString());
