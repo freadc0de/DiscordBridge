@@ -1,5 +1,6 @@
 package dev.fread.discordbridge;
 
+import dev.fread.discordbridge.account.LinkManager;
 import dev.fread.discordbridge.command.DChatCommand;
 import dev.fread.discordbridge.config.ConfigManager;
 import dev.fread.discordbridge.discord.DiscordBot;
@@ -12,6 +13,7 @@ public final class DiscordChatBridge extends JavaPlugin {
 
     private ConfigManager configManager;
     private DiscordBot    discordBot;
+    private LinkManager   linkManager;
 
     @Override
     public void onEnable() {
@@ -20,32 +22,39 @@ public final class DiscordChatBridge extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.load();
 
+        linkManager = new LinkManager(this);
+        linkManager.load();
+
         try {
             discordBot = new DiscordBot(this,
                     getConfig().getString("discord.token"),
                     getConfig().getString("discord.channelId"));
-            getLogger().info("Discord-бот запущен.");
+            getLogger().info("Discord bot started.");
         } catch (Exception ex) {
-            getLogger().severe("Не удалось инициализировать Discord-бот: " + ex.getMessage());
+            getLogger().severe("Failed to init Discord bot: " + ex.getMessage());
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        getServer().getPluginManager().registerEvents(new ChatListener(this),      this);
-        getServer().getPluginManager().registerEvents(new JoinQuitListener(this),  this);
+        /* listeners */
+        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
+        getServer().getPluginManager().registerEvents(new JoinQuitListener(this), this);
 
+        /* command */
         getCommand("dchat").setExecutor(new DChatCommand(this));
         getCommand("dchat").setTabCompleter((s, c, l, a) -> java.util.Collections.singletonList("reload"));
 
-        getLogger().info(ChatColor.GREEN + "DiscordChatBridge активирован!");
+        getLogger().info(ChatColor.GREEN + "DiscordChatBridge enabled!");
     }
 
     @Override
     public void onDisable() {
         if (discordBot != null) discordBot.shutdown();
-        getLogger().info("DiscordChatBridge выключен.");
+        linkManager.save();
+        getLogger().info("DiscordChatBridge disabled.");
     }
 
     public ConfigManager getConfigManager() { return configManager; }
     public DiscordBot    getDiscordBot()    { return discordBot;    }
+    public LinkManager   getLinkManager()   { return linkManager;   }
 }

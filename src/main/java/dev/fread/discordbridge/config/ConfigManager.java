@@ -30,14 +30,13 @@ public class ConfigManager {
         plugin.reloadConfig();
         ConfigurationSection c = plugin.getConfig();
 
-        toDiscordPrefix          = c.getString("chat.to-discord-prefix",   "&00FF00[MC]&r ");
-        toMinecraftPrefix        = c.getString("chat.to-minecraft-prefix", "&00FF00[DISCORD]&r ");
+        toDiscordPrefix   = c.getString("chat.to-discord-prefix",   "&00FF00[MC]&r ");
+        toMinecraftPrefix = c.getString("chat.to-minecraft-prefix", "&00FF00[DISCORD]&r ");
 
         mcToDiscordFormat        = c.getStringList("messages.minecraft-to-discord");
         discordToMinecraftFormat = c.getStringList("messages.discord-to-minecraft");
         discordHoverLines        = c.getStringList("messages.discord-hover");
     }
-
 
     public String formatMcToDiscord(Player p, String msg) {
         String base = mcToDiscordFormat.get(0)
@@ -55,19 +54,16 @@ public class ConfigManager {
 
     public List<String> buildDiscordHover(String author, String msg) {
         return discordHoverLines.stream()
-                .map(s -> applyColors(
-                        s.replace("{author}", author)
-                                .replace("{message}", msg)))
+                .map(s -> applyColors(s.replace("{author}", author)
+                        .replace("{message}", msg)))
                 .collect(Collectors.toList());
     }
-
 
     private String applyColors(String s) {
         Matcher m = HEX_PATTERN.matcher(s);
         StringBuffer buf = new StringBuffer();
         while (m.find())
-            m.appendReplacement(buf,
-                    ChatColor.of("#" + m.group(1)).toString());
+            m.appendReplacement(buf, ChatColor.of("#" + m.group(1)).toString());
         m.appendTail(buf);
         return ChatColor.translateAlternateColorCodes('&', buf.toString());
     }

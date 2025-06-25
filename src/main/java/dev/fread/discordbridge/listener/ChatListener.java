@@ -13,7 +13,6 @@ public class ChatListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent e) {
-        plugin.getDiscordBot()
-                .sendMinecraftEmbed(e.getPlayer(), e.getMessage());
+        plugin.getDiscordBot().sendMinecraftEmbed(e.getPlayer(), e.getMessage());
     }
 }

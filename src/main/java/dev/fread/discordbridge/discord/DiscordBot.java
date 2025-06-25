@@ -1,6 +1,5 @@
 package dev.fread.discordbridge.discord;
 
-
 import dev.fread.discordbridge.DiscordChatBridge;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -27,6 +26,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Handles Discord ↔ Minecraft messaging and DM-based account linking.
+ */
 public class DiscordBot {
 
     private final DiscordChatBridge plugin;
@@ -36,32 +38,29 @@ public class DiscordBot {
 
     private static final Pattern COLOR_CODE = Pattern.compile("§[0-9A-FK-ORXa-fk-orx]");
 
-    public DiscordBot(DiscordChatBridge plugin,
-                      String token,
-                      String channelId)
+    public DiscordBot(DiscordChatBridge plugin, String token, String channelId)
             throws LoginException, InterruptedException {
-
         this.plugin    = plugin;
         this.channelId = channelId;
 
+        /* include DIRECT_MESSAGES so we can read private codes */
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 GatewayIntent.GUILD_MESSAGES,
-                GatewayIntent.MESSAGE_CONTENT
-        );
+                GatewayIntent.DIRECT_MESSAGES,
+                GatewayIntent.MESSAGE_CONTENT);
 
         jda = JDABuilder.createDefault(token, intents)
-                .disableCache(CacheFlag.VOICE_STATE,
-                        CacheFlag.EMOJI,
-                        CacheFlag.STICKER,
-                        CacheFlag.SCHEDULED_EVENTS)
+                .disableCache(CacheFlag.VOICE_STATE, CacheFlag.EMOJI,
+                        CacheFlag.STICKER, CacheFlag.SCHEDULED_EVENTS)
                 .setMemberCachePolicy(MemberCachePolicy.NONE)
                 .build()
                 .awaitReady();
 
         channel = jda.getTextChannelById(channelId);
         if (channel == null)
-            plugin.getLogger().warning("Канал Discord " + channelId + " не найден!");
+            plugin.getLogger().warning("Discord channel " + channelId + " not found!");
 
+        /* ---------------- Discord (guild) → Minecraft ---------------- */
         jda.addEventListener(new ListenerAdapter() {
             @Override
             public void onMessageReceived(@NotNull MessageReceivedEvent e) {
@@ -77,52 +76,73 @@ public class DiscordBot {
                 List<String> hoverLines = plugin.getConfigManager().buildDiscordHover(author, content);
                 Component hover = Component.empty();
                 for (int i = 0; i < hoverLines.size(); i++) {
-                    hover = hover.append(
-                            LegacyComponentSerializer.legacySection().deserialize(hoverLines.get(i)));
-                    if (i < hoverLines.size() - 1)
-                        hover = hover.append(Component.newline());
+                    hover = hover.append(LegacyComponentSerializer.legacySection()
+                            .deserialize(hoverLines.get(i)));
+                    if (i < hoverLines.size() - 1) hover = hover.append(Component.newline());
                 }
 
                 line = line.hoverEvent(HoverEvent.showText(hover))
                         .clickEvent(ClickEvent.openUrl(e.getMessage().getJumpUrl()));
 
-                for (Player p : Bukkit.getOnlinePlayers())
-                    p.sendMessage(line);
+                for (Player p : Bukkit.getOnlinePlayers()) p.sendMessage(line);
+            }
+        });
+
+        /* ---------------- Discord DM → account link ------------------ */
+        jda.addEventListener(new ListenerAdapter() {
+            @Override
+            public void onMessageReceived(@NotNull MessageReceivedEvent e) {
+                if (e.isFromGuild() || e.getAuthor().isBot()) return;
+
+                String msg = e.getMessage().getContentDisplay().trim();
+
+                plugin.getLinkManager().consumeCode(msg).ifPresentOrElse(uuid -> {
+                    // SUCCESS
+                    plugin.getLinkManager().link(uuid, e.getAuthor().getId());
+                    sendDMEmbed(e.getChannel(), Color.decode("#57F287"),
+                            "✅ Ваш аккаунт успешно слинкован!");
+                    plugin.getLogger().info("Linked " + uuid + " <-> " + e.getAuthor().getAsTag());
+                }, () -> {
+                    // either already linked or invalid code
+                    sendDMEmbed(e.getChannel(), Color.decode("#ED4245"),
+                            "❌ Этот код недействителен либо вы уже линковали ваш аккаунт.");
+                });
             }
         });
     }
 
+    /* ------------------------------------------------------------------ */
+    /*                          public helpers                             */
+    /* ------------------------------------------------------------------ */
+    public String getBotName() {
+        return jda.getSelfUser().getName() + "#" + jda.getSelfUser().getDiscriminator();
+    }
 
+    /* Minecraft → Discord chat embed */
     public void sendMinecraftEmbed(Player player, String plainMessage) {
         if (channel == null) return;
-
-        String avatar = "https://mc-heads.net/avatar/" + player.getName() + "/64";
-        String time   = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-
         EmbedBuilder eb = new EmbedBuilder()
-                .setAuthor(player.getName(), null, avatar)
+                .setAuthor(player.getName(), null,
+                        "https://mc-heads.net/avatar/" + player.getName() + "/64")
                 .setDescription(plainMessage)
                 .setColor(Color.decode("#adfbff"))
-                .setFooter("Stats • " + time);
-
+                .setFooter("Stats • " +
+                        LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
+    /* join / quit */
     public void sendJoinLeaveEmbed(Player player, boolean joined) {
         if (channel == null) return;
-
-        Color  color  = joined ? Color.decode("#57F287") : Color.decode("#ED4245");
-        String action = joined ? "зашёл на сервер."      : "вышел с сервера.";
-
-        String avatar = "https://mc-heads.net/avatar/" + player.getName() + "/64";
-        String time   = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-
+        Color  c = joined ? Color.decode("#57F287") : Color.decode("#ED4245");
+        String text = "**" + player.getName() + "** " + (joined ? "зашел на сервер." : "вышел с сервера.");
         EmbedBuilder eb = new EmbedBuilder()
-                .setAuthor(player.getName(), null, avatar)
-                .setDescription("**" + player.getName() + "** " + action)
-                .setColor(color)
-                .setFooter("Stats • " + time);
-
+                .setAuthor(player.getName(), null,
+                        "https://mc-heads.net/avatar/" + player.getName() + "/64")
+                .setDescription(text)
+                .setColor(c)
+                .setFooter("Stats • " +
+                        LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
@@ -132,4 +152,14 @@ public class DiscordBot {
     }
 
     public void shutdown() { jda.shutdownNow(); }
+
+    /* ------------------------------------------------------------------ */
+    /*                         private helpers                             */
+    /* ------------------------------------------------------------------ */
+    private void sendDMEmbed(MessageChannel dm, Color color, String text) {
+        EmbedBuilder eb = new EmbedBuilder()
+                .setDescription(text)
+                .setColor(color);
+        dm.sendMessageEmbeds(eb.build()).queue();
+    }
 }
