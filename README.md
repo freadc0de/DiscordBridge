@@ -73,9 +73,10 @@ PRs are welcome!
 Commit message format: `type(scope): subject`.
 
 
+---
 
 
-# DiscordChatBridge
+# DiscordChatBridge (Russian)
 
 Двусторонний мост между чатом **Minecraft** (Spigot/Paper/Purpur) и **Discord**
 
