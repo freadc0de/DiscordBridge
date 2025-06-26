@@ -1,3 +1,80 @@
+# DiscordChatBridge (English)
+
+A two-way bridge between **Minecraft** (Spigot / Paper / Purpur) chat and **Discord**
+
+---
+
+## ✨ Features
+
+|                  | Details                                                                       |
+| ---------------- | ----------------------------------------------------------------------------- |
+| **MC → Discord** | Messages are forwarded to Discord as an **Embed** with the player’s avatar    |
+| **Discord → MC** | A Discord user’s reply appears in-game with a customizable prefix             |
+| **Join / Quit**  | Player joins and quits are announced with colorful Embeds                     |
+| **Account link** | You can link your Minecraft account to your Discord account                   |
+| **HEX colors**   | `&RRGGBB` supported in config (1.16+)                                         |
+| **1.16 → 1.20**  | Works on any Paper/Purpur core 1.16.5+                                        |
+| **MySQL**        | MySQL database support included                                               |
+
+---
+
+## 📋 Version Matrix
+
+|   Minecraft     | Latest release | Java version | Platforms | Support status        |
+|:---------------:|:--------------:|:------------:|:---------:|:----------------------|
+| 1.20 – 1.20.6   |    _latest_    |      21      | Paper     | ✅ **Active Release** |
+| 1.19 – 1.19.4   |    _latest_    |      17      | Paper     | ✅ **Active Release** |
+
+---
+
+## 📥 Installation
+
+1. **Download** the release from [Releases](https://github.com/freadc0de/DiscordBridge/releases)
+2. Drop `DiscordChatBridge.jar` into your server’s `plugins/` folder.
+3. Start the server, then open `plugins/DiscordChatBridge/config.yml`
+4. `/dchat reload` — reload the plugin configuration.
+
+> 💡 **Tip:** In Discord’s developer panel enable *MESSAGE CONTENT INTENT*, otherwise the bot can’t read message text.
+
+---
+
+## 🛠️ Building from source
+
+# 1. Clone the repository
+```bash
+git clone https://github.com/your-repo/DiscordChatBridge.git
+cd DiscordChatBridge
+```
+
+# 2. Build the fat-jar (Gradle 8, Java 17)
+```bash
+./gradlew shadowJar
+```
+
+# 3. The built file will be here:
+```bash
+build/libs/discord-chat-bridge-<version>.jar
+```
+
+| Key                    | Description                       |
+| ---------------------- | --------------------------------- |
+| `token`                | Discord bot token                 |
+| `channelId`            | ID of the channel the plugin bridges |
+| `to‑minecraft-prefix`  | Prefix for messages coming from Discord  |
+| `discord-to-minecraft` | Format of the line that appears in Minecraft chat  |
+
+Supported placeholders: `{player}`, `{author}`, `{message}`.
+
+---
+
+## 🤝 Contributing
+
+PRs are welcome!
+Commit message format: `type(scope): subject`.
+
+
+
+
 # DiscordChatBridge
 
 Двусторонний мост между чатом **Minecraft** (Spigot/Paper/Purpur) и **Discord**
