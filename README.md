@@ -12,8 +12,8 @@ A two-way bridge between **Minecraft** (Spigot / Paper / Purpur) chat and **Disc
 | **Discord → MC** | A Discord user’s reply appears in-game with a customizable prefix             |
 | **Join / Quit**  | Player joins and quits are announced with colorful Embeds                     |
 | **Account link** | You can link your Minecraft account to your Discord account                   |
-| **HEX colors**   | `&RRGGBB` supported in config (1.16+)                                         |
-| **1.16 → 1.20**  | Works on any Paper/Purpur core 1.16.5+                                        |
+| **HEX colors**   | `&RRGGBB` supported in config                                                 |
+| **1.19 → 1.20**  | Works on any Paper/Purpur core 1.19+                                          |
 | **MySQL**        | MySQL database support included                                               |
 
 ---
@@ -90,8 +90,8 @@ Commit message format: `type(scope): subject`.
 | **Discord → MC** | Ответ Discord‑пользователя появляется в игровом чате с настраиваемым префиксом   |
 | **Join / Quit**  | Вход и выход игроков объявляется цветными Embed‑ами                              |
 | **Account link** | Вы можете связать свой аккаунт Minecraft с аккунтом Discord                      |
-| **HEX‑цвета**    | В конфиге поддерживается `&RRGGBB` (1.16+)                                       |
-| **1.16 → 1.20**  | Работает на любых ядрах Paper/Purpur 1.16.5+                                     |
+| **HEX‑цвета**    | В конфиге поддерживается `&RRGGBB`                                               |
+| **1.19 → 1.20**  | Работает на любых ядрах Paper/Purpur 1.19+                                       |
 | **MySQL**        | Присутствует поддержка базы данных MySQL                                         |
 
 ---
