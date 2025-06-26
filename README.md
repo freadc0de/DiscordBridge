@@ -22,8 +22,8 @@ A two-way bridge between **Minecraft** (Spigot / Paper / Purpur) chat and **Disc
 
 |   Minecraft     | Latest release | Java version | Platforms | Support status        |
 |:---------------:|:--------------:|:------------:|:---------:|:----------------------|
-| 1.20 – 1.20.6   |    _latest_    |      21      | Paper     | ✅ **Active Release** |
-| 1.19 – 1.19.4   |    _latest_    |      17      | Paper     | ✅ **Active Release** |
+| 1.20 – 1.20.6   |    _latest_    |      21      | Spigot, Paper, Purpur | ✅ **Active Release** |
+| 1.19 – 1.19.4   |    _latest_    |      17      | Spigot, Paper, Purpur | ✅ **Active Release** |
 
 ---
 
@@ -100,8 +100,8 @@ Commit message format: `type(scope): subject`.
 
 |    Minecraft    | Последний релиз | Версия Java  | Платформы     | Статус поддержки               |
 |:---------------:|:---------------:|:------------:|:--------------|:-------------------------------|
-|  1.20 - 1.20.6  |    _latest_     |      21      | Paper         | ✅ **Active Release**          |
-|  1.19 – 1.19.4  |    _latest_     |      17      | Paper         | ✅ **Active Release**          |
+|  1.20 - 1.20.6  |    _latest_     |      21      | Spigot, Paper, Purpur | ✅ **Active Release**          |
+|  1.19 – 1.19.4  |    _latest_     |      17      | Spigot, Paper, Purpur | ✅ **Active Release**          |
 
 ---
 
