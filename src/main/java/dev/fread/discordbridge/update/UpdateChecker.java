@@ -15,12 +15,11 @@ public class UpdateChecker {
 
     private static final String API_URL =
             "https://api.github.com/repos/freadc0de/DiscordChatBridge/releases/latest";
+    private static final Pattern TAG = Pattern.compile("\"tag_name\"\\s*:\\s*\"v?([0-9.]+)\"");
 
     private final DiscordChatBridge plugin;
 
-    public UpdateChecker(DiscordChatBridge plugin) {
-        this.plugin = plugin;
-    }
+    public UpdateChecker(DiscordChatBridge plugin) { this.plugin = plugin; }
 
     public void check() {
         CompletableFuture.runAsync(() -> {
@@ -30,26 +29,30 @@ public class UpdateChecker {
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
 
-                BufferedReader br = new BufferedReader(
-                        new InputStreamReader(conn.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) json.append(line);
-                br.close();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                    StringBuilder json = new StringBuilder();
+                    for (String ln; (ln = br.readLine()) != null; ) json.append(ln);
 
-                Matcher m = Pattern.compile("\"tag_name\"\\s*:\\s*\"v?([0-9.]+)\"")
-                        .matcher(json.toString());
-                if (!m.find()) return;            // tag_name not found
+                    Matcher m = TAG.matcher(json.toString());
+                    if (!m.find()) return;
 
-                String latest  = m.group(1);
-                String current = plugin.getDescription().getVersion();
+                    String latest  = m.group(1);
+                    String current = plugin.getDescription().getVersion();
+                    if (!isNewer(latest, current)) return;
 
-                if (isNewer(latest, current)) {
-                    Bukkit.getScheduler().runTask(plugin, () ->
-                            plugin.getLogger().info("A new version of DiscordChatBridge is available: "
-                                    + latest + " (current " + current + ")"));
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        plugin.getLogger().info("");
+                        plugin.getLogger().info("=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=");
+                        plugin.getLogger().info("");
+                        plugin.getLogger().info("A newer version of DiscordChatBridge is available!");
+                        plugin.getLogger().info("Latest : " + latest);
+                        plugin.getLogger().info("Current: " + current);
+                        plugin.getLogger().info("Download: https://github.com/freadc0de/DiscordChatBridge/releases/latest");
+                        plugin.getLogger().info("");
+                        plugin.getLogger().info("=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=");
+                        plugin.getLogger().info("");
+                    });
                 }
-
             } catch (Exception ex) {
                 plugin.getLogger().warning("Update check failed: " + ex.getMessage());
             }
@@ -61,8 +64,8 @@ public class UpdateChecker {
         String[] c = current.split("\\.");
         int len = Math.max(l.length, c.length);
         for (int i = 0; i < len; i++) {
-            int lv = (i < l.length) ? Integer.parseInt(l[i]) : 0;
-            int cv = (i < c.length) ? Integer.parseInt(c[i]) : 0;
+            int lv = i < l.length ? Integer.parseInt(l[i]) : 0;
+            int cv = i < c.length ? Integer.parseInt(c[i]) : 0;
             if (lv > cv) return true;
             if (lv < cv) return false;
         }

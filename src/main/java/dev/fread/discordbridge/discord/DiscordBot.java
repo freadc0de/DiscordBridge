@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class DiscordBot {
 
@@ -36,14 +37,17 @@ public class DiscordBot {
     private final JDA               jda;
     private final String            channelId;
     private final String            requiredRoleId;
+    private final boolean           roleGate;
     private       TextChannel       channel;
 
     private static final Pattern COLOR_CODE = Pattern.compile("§[0-9A-FK-ORXa-fk-orx]");
 
-    public DiscordBot(DiscordChatBridge plugin, String token, String channelId) throws LoginException, InterruptedException {
-        this.plugin    = plugin;
-        this.channelId = channelId;
+    public DiscordBot(DiscordChatBridge plugin, String token, String channelId)
+            throws LoginException, InterruptedException {
+        this.plugin         = plugin;
+        this.channelId      = channelId;
         this.requiredRoleId = plugin.getConfig().getString("discord.requiredRoleId", "");
+        this.roleGate       = plugin.getConfig().getBoolean("discord.role-gate", true);
 
         EnumSet<GatewayIntent> intents = EnumSet.of(
                 GatewayIntent.GUILD_MESSAGES,
@@ -58,24 +62,30 @@ public class DiscordBot {
                 .awaitReady();
 
         channel = jda.getTextChannelById(channelId);
-        if (channel == null) plugin.getLogger().warning("Discord channel " + channelId + " not found!");
+        if (channel == null)
+            plugin.getLogger().warning("Discord channel " + channelId + " not found!");
 
+        /* single listener handles guild + DM */
         jda.addEventListener(new ListenerAdapter() {
             @Override public void onMessageReceived(@NotNull MessageReceivedEvent e) {
                 if (e.getAuthor().isBot()) return;
-                if (e.isFromGuild() && e.getChannel().getId().equals(channelId)) relayToMinecraft(e);
-                else if (!e.isFromGuild()) handleDmCode(e);
+                if (e.isFromGuild() && e.getChannel().getId().equals(channelId)) {
+                    relayToMinecraft(e);
+                } else if (!e.isFromGuild()) {
+                    handleDmCode(e);
+                }
             }
         });
     }
 
     public boolean hasRequiredRole(UUID uuid) {
-        if (requiredRoleId.isEmpty()) return true;
+        if (!roleGate || requiredRoleId.isEmpty()) return true;
         String discId = plugin.getLinkManager().getDiscordId(uuid);
         if (discId == null || channel == null) return false;
         Member m = channel.getGuild().getMemberById(discId);
         if (m == null) {
-            try { m = channel.getGuild().retrieveMemberById(discId).complete(); } catch (Exception ignored) {}
+            try { m = channel.getGuild().retrieveMemberById(discId).complete(); }
+            catch (Exception ignored) {}
         }
         return m != null && m.getRoles().stream().anyMatch(r -> r.getId().equals(requiredRoleId));
     }
@@ -85,7 +95,7 @@ public class DiscordBot {
         plugin.getLinkManager().consumeCode(code).ifPresentOrElse(uuid -> {
             plugin.getLinkManager().link(uuid, e.getAuthor().getId());
             sendDmEmbed(e.getChannel(), new Color(0x57F287), "✅ Ваш аккаунт успешно слинкован!");
-        }, () -> sendDmEmbed(e.getChannel(), new Color(0xED4245), "❌ Неверный код либо аккаунт уже слинкован"));
+        }, () -> sendDmEmbed(e.getChannel(), new Color(0xED4245), "❌ Неверный код либо аккаунт уже слинкован."));
     }
 
     private void sendDmEmbed(MessageChannel dm, Color color, String text) {
@@ -95,16 +105,22 @@ public class DiscordBot {
     private void relayToMinecraft(MessageReceivedEvent e) {
         String author  = e.getAuthor().getName();
         String content = e.getMessage().getContentDisplay();
-        String legacy  = plugin.getConfigManager().formatDiscordToMinecraft(author, content);
-        Component line = LegacyComponentSerializer.legacySection().deserialize(legacy);
+
+        Component msg = LegacyComponentSerializer.legacySection().deserialize(
+                plugin.getConfigManager().formatDiscordToMinecraft(author, content));
+
         List<Component> hoverParts = plugin.getConfigManager()
                 .buildDiscordHover(author, content).stream()
                 .map(s -> (Component) LegacyComponentSerializer.legacySection().deserialize(s))
-                .collect(java.util.stream.Collectors.toList());
-        Component hover = Component.join(JoinConfiguration.separator(Component.newline()), hoverParts);
-        line = line.hoverEvent(HoverEvent.showText(hover))
+                .collect(Collectors.toList());
+
+        Component hover = Component.join(
+                JoinConfiguration.separator(Component.newline()), hoverParts);
+
+        msg = msg.hoverEvent(HoverEvent.showText(hover))
                 .clickEvent(ClickEvent.openUrl(e.getMessage().getJumpUrl()));
-        for (Player p : Bukkit.getOnlinePlayers()) p.sendMessage(line);
+
+        for (Player p : Bukkit.getOnlinePlayers()) p.sendMessage(msg);
     }
 
     public String getBotName() { return jda.getSelfUser().getAsTag(); }
@@ -131,7 +147,9 @@ public class DiscordBot {
     }
 
     public void sendToDiscordPlain(String msg) {
-        if (channel != null) channel.sendMessage(COLOR_CODE.matcher(msg).replaceAll("")).queue();
+        if (channel != null)
+            channel.sendMessage(COLOR_CODE.matcher(msg).replaceAll(""))
+                    .queue();
     }
 
     public void shutdown() { jda.shutdownNow(); }

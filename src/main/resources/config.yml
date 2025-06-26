@@ -3,6 +3,10 @@ update-check: true
 discord:
   token: "BOT_TOKEN"
   channelId: "123456789012345678"
+
+# - - - - - - - - - - - - - - - -
+
+  role-gate: true # set false to let any linked user join
   requiredRoleId: "123456789012345678" # role that grants access
 
 mysql:
@@ -13,6 +17,7 @@ mysql:
   user: root
   password: "password"
 
+# - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . -
 
 chat:
   to-minecraft-prefix: "&3220a6[&7568f9ᴅ&3220a6] &c9c0ff• "
@@ -29,6 +34,8 @@ messages:
     - "&d3d2ff • Чтобы перейти к этому сообщению, нажмите "
     - "&d3d2ff на текст"
     - "&7"
+
+# - - - - - - - - - - - - - - - -
 
 link:
   role-kick:
@@ -56,6 +63,8 @@ link:
     - ""
     - ""
     - "&4d4f50* * *"
+
+# - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . - . -
 
 #
 #         *        .        ✦          .             .         *

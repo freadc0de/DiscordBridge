@@ -1,15 +1,15 @@
 name: DiscordChatBridge
 main: dev.fread.discordbridge.DiscordChatBridge
-version: 1.4.2
+version: 1.4.3
 api-version: 1.16
 author: fread
-description: Чат-мост между Minecraft и Discord
+description: Chat bridge from discord to minecraft and vice versa
 commands:
   dchat:
-    description: Перезагрузка конфигурации DiscordChatBridge
+    description: Reload DiscordChatBridge Configuration
     usage: /<command> reload
     permission: dchat.reload
 permissions:
   dchat.reload:
-    description: Позволяет перезагружать конфиг плагина
+    description: Allows you to reload the plugin config
     default: op
