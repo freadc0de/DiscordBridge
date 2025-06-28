@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class UpdateChecker {
 
     private static final String API_URL =
-            "https://api.github.com/repos/freadc0de/DiscordChatBridge/releases/latest";
+            "https://api.github.com/repos/slyphmp4/DiscordChatBridge/releases/latest";
     private static final Pattern TAG = Pattern.compile("\"tag_name\"\\s*:\\s*\"v?([0-9.]+)\"");
 
     private final DiscordChatBridge plugin;
