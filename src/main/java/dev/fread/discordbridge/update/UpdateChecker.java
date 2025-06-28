@@ -47,7 +47,7 @@ public class UpdateChecker {
                         plugin.getLogger().info("A newer version of DiscordChatBridge is available!");
                         plugin.getLogger().info("Latest : " + latest);
                         plugin.getLogger().info("Current: " + current);
-                        plugin.getLogger().info("Download: https://github.com/freadc0de/DiscordChatBridge/releases/latest");
+                        plugin.getLogger().info("Download: https://github.com/slyphmp4/DiscordChatBridge/releases/latest");
                         plugin.getLogger().info("");
                         plugin.getLogger().info("=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=");
                         plugin.getLogger().info("");
