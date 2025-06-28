@@ -1,5 +1,7 @@
 # DiscordChatBridge (English)
 
+![java21](https://img.shields.io/badge/Java-21-blue) ![paperapi](https://img.shields.io/badge/API-Paper%201.20%2B-orange)
+
 A two-way bridge between **Minecraft** (Spigot / Paper / Purpur) chat and **Discord**
 
 ---
